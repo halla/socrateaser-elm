@@ -1,8 +1,9 @@
-import Html exposing (div, button, text, input, Html)
-import Html.Events exposing (onClick, on, targetValue)
-import Html.Attributes exposing (id)
+import Html exposing (div, button, text, input, Html, ul, li, Attribute)
+import Html.Events exposing (onClick, on, targetValue, keyCode)
+import Html.Attributes exposing (id, value)
 import StartApp.Simple as StartApp
-
+import Json.Decode as Json
+import Signal exposing (Address, Signal)
 
 main =
     StartApp.start { model = init, view = view, update = update }
@@ -17,25 +18,44 @@ actions =
 
 type alias Model =
     { question : String
+    , answers : List String
     , answer : String
     }
 
 init : Model
 init =
     { question = "What if?"
-    , answer = "ans"
+    , answers = ["answer1", "answer2" ]
+    , answer = ""
     }
 
 view : Signal.Address Action -> Model -> Html
 view = counter
 
+-- enter handling from todomvc --
+onEnter : Address a -> a -> Attribute
+onEnter address value =
+    on "keydown"
+      (Json.customDecoder keyCode is13)
+      (\_ -> Signal.message address value)
+
+
+is13 : Int -> Result String ()
+is13 code =
+  if code == 13 then Ok () else Err "not the right key code"
+
+
+answerLine answer = li [] [ text answer ]
 
 counter address model =
   div []
     [ div [] [ text model.question ]
     , input [ id "question"
-            , on "input" targetValue (Signal.message address << SetAnswer)] []
-    , div [] [ text model.answer ]
+            , value model.answer
+            , on "input" targetValue (Signal.message address << SetAnswer)
+            , onEnter address CommitAnswer
+            ] []
+    , div [] (List.map answerLine model.answers)
     ]
 
 
@@ -43,6 +63,7 @@ type Action
     = NoOp
     | SetQuestion String
     | SetAnswer String
+    | CommitAnswer
 
 update : Action -> Model -> Model
 update action model =
@@ -53,3 +74,5 @@ update action model =
         { model | question = question' }
     SetAnswer answer' ->
         { model | answer = answer' }
+    CommitAnswer ->
+        { model | answers = model.answer :: model.answers, answer = "" }
