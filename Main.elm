@@ -1,9 +1,10 @@
-import Html exposing (div, button, text, input, Html, ul, li, Attribute)
+import Html exposing (div, button, text, input, Html, ul, li, Attribute, select, option)
 import Html.Events exposing (onClick, on, targetValue, keyCode)
-import Html.Attributes exposing (id, value)
+import Html.Attributes exposing (id, value, autofocus, name)
 import StartApp.Simple as StartApp
 import Json.Decode as Json
 import Signal exposing (Address, Signal)
+import Questions
 
 main =
     StartApp.start { model = init, view = view, update = update }
@@ -51,15 +52,19 @@ is13 code =
 
 answerLine answer = li [] [ text answer ]
 
+questionSetOption questionSet = option [ value questionSet.id] [(text questionSet.title)]
+
 counter address model =
   div []
     [ div [] [ text model.question ]
     , input [ id "question"
             , value model.answer
             , on "input" targetValue (Signal.message address << SetAnswer)
+            , autofocus True
             , onEnter address CommitAnswer
             ] []
     , div [] (List.map answerLine model.answers)
+    , select [] (List.map questionSetOption Questions.list)
     ]
 
 nextQuestion model =
@@ -83,7 +88,8 @@ update : Action -> Model -> Model
 update action model =
   case action of
     NoOp -> model
-
+    --SetQuestionSet questionSet ->
+    --    { model | questions = }
     SetQuestion question' ->
         { model | question = question' }
     SetAnswer answer' ->
