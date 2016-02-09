@@ -17,17 +17,21 @@ actions =
     Signal.mailbox NoOp
 
 type alias Model =
-    { question : String
+    { questions : (List String)
+    , question : String
     , answers : List String
     , answer : String
     }
 
+
 init : Model
 init =
-    { question = "What if?"
+    { questions = [ "What if?", "What then?"]
+    , question = "Press <enter> on empty line to get the next question."
     , answers = ["answer1", "answer2" ]
     , answer = ""
     }
+
 
 view : Signal.Address Action -> Model -> Html
 view = counter
@@ -58,6 +62,16 @@ counter address model =
     , div [] (List.map answerLine model.answers)
     ]
 
+nextQuestion model =
+    let
+        q' = List.head model.questions
+        qs' = List.tail model.questions
+    in
+        case (q', qs') of
+            (Just q, Just qs) -> { model | question = q , questions = qs }
+            (Just q, Nothing) -> { model | question = q }
+            (Nothing, Just qs) -> { model | question = "This shouldn't have happened!"  }
+            (Nothing, Nothing) -> { model | question = "Yay! We're done!" }
 
 type Action
     = NoOp
@@ -75,4 +89,6 @@ update action model =
     SetAnswer answer' ->
         { model | answer = answer' }
     CommitAnswer ->
-        { model | answers = model.answer :: model.answers, answer = "" }
+        if model.answer == ""
+            then nextQuestion model
+            else { model | answers = model.answers ++ [model.answer] , answer = "" }
