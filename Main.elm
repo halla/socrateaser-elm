@@ -28,7 +28,7 @@ type alias Model =
 init : Model
 init =
     { questions = [ "What if?", "What then?"]
-    , question = "Press <enter> on empty line to get the next question."
+    , question = "Press <enter> on empty line to get the next question1."
     , answers = ["answer1", "answer2" ]
     , answer = ""
     }
@@ -64,7 +64,9 @@ counter address model =
             , onEnter address CommitAnswer
             ] []
     , div [] (List.map answerLine model.answers)
-    , select [] (List.map questionSetOption Questions.list)
+    , select [ on "change" targetValue (Signal.message address << SetQuestionSet)
+
+        ] (List.map questionSetOption Questions.list)
     ]
 
 nextQuestion model =
@@ -83,17 +85,22 @@ type Action
     | SetQuestion String
     | SetAnswer String
     | CommitAnswer
+    | SetQuestionSet String
 
 update : Action -> Model -> Model
 update action model =
   case action of
     NoOp -> model
-    --SetQuestionSet questionSet ->
-    --    { model | questions = }
+    SetQuestionSet questionSetId ->
+        let
+            qs = Questions.get questionSetId
+        in
+            { model | questions = qs,
+                question = Maybe.withDefault "" (List.head qs) }
     SetQuestion question' ->
         { model | question = question' }
     SetAnswer answer' ->
-        { model | answer = answer' }
+        { model | answer = answer' }    
     CommitAnswer ->
         if model.answer == ""
             then nextQuestion model
