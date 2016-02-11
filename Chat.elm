@@ -1,6 +1,6 @@
-module Chat (sendMsg, getMsgs, Model, init, Action, update) where
+module Chat (sendMsg, getMsgs, Model, init, Action(SendMsg), update, view ) where
 
-import Html exposing (Html, text)
+import Html exposing (Html, text, ul, li)
 
 type alias User = String
 
@@ -24,8 +24,9 @@ init = ["Welcome to Socrateaser! Press <enter> on empty line to get the next que
 -- View --
 
 --view : Signal Action -> Model -> Html--
-view = text "ChatBox Here"
+view address model = ul [] (List.map chatLine model)
 
+chatLine line = li [] [text line]
 
 
 -- Update --

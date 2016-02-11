@@ -68,8 +68,8 @@ counter address model =
             ] []
     , div [] (List.map answerLine model.answers)
     , select [ on "change" targetValue (Signal.message address << SetQuestionSet)
-
         ] (List.map questionSetOption Questions.list)
+    , Chat.view (Signal.forwardTo address ChatAction) model.chat
     ]
 
 nextQuestion model =
@@ -78,7 +78,11 @@ nextQuestion model =
         qs' = List.tail model.questions
     in
         case (q', qs') of
-            (Just q, Just qs) -> { model | question = q , questions = qs }
+            (Just q, Just qs) -> { model
+                | question = q
+                , questions = qs
+                , chat = (update (ChatAction (Chat.SendMsg "Socrateaser" q)) model).chat
+            }
             (Just q, Nothing) -> { model | question = q }
             (Nothing, Just qs) -> { model | question = "This shouldn't have happened!"  }
             (Nothing, Nothing) -> { model | question = "Yay! We're done!" }
@@ -102,13 +106,18 @@ update action model =
             { model | questions = qs,
                 question = Maybe.withDefault "" (List.head qs) }
     SetQuestion question' ->
-        { model | question = question' }
+        { --model | question = question'
+         model |chat = (update (ChatAction (Chat.SendMsg "Socrateaser" question')) model).chat
+        }
     SetAnswer answer' ->
         { model | answer = answer' }
     CommitAnswer ->
         if model.answer == ""
             then nextQuestion model
-            else { model | answers = model.answers ++ [model.answer] , answer = "" }
+            else { model | answers = model.answers ++ [model.answer]
+            , answer = ""
+            , chat = (update (ChatAction (Chat.SendMsg "Me" model.answer)) model).chat
+        }
     ChatAction act ->
         { model | chat = Chat.update act model.chat
 
