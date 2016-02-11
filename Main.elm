@@ -5,6 +5,7 @@ import StartApp.Simple as StartApp
 import Json.Decode as Json
 import Signal exposing (Address, Signal)
 import Questions
+import Chat
 
 main =
     StartApp.start { model = init, view = view, update = update }
@@ -22,6 +23,7 @@ type alias Model =
     , question : String
     , answers : List String
     , answer : String
+    , chat : Chat.Model
     }
 
 
@@ -31,6 +33,7 @@ init =
     , question = "Press <enter> on empty line to get the next question1."
     , answers = ["answer1", "answer2" ]
     , answer = ""
+    , chat = Chat.init
     }
 
 
@@ -86,6 +89,7 @@ type Action
     | SetAnswer String
     | CommitAnswer
     | SetQuestionSet String
+    | ChatAction Chat.Action
 
 update : Action -> Model -> Model
 update action model =
@@ -100,8 +104,12 @@ update action model =
     SetQuestion question' ->
         { model | question = question' }
     SetAnswer answer' ->
-        { model | answer = answer' }    
+        { model | answer = answer' }
     CommitAnswer ->
         if model.answer == ""
             then nextQuestion model
             else { model | answers = model.answers ++ [model.answer] , answer = "" }
+    ChatAction act ->
+        { model | chat = Chat.update act model.chat
+
+        }
