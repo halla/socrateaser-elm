@@ -110,7 +110,7 @@ update action model =
             then nextQuestion model
             else { model | answers = model.answers ++ [model.answer]
             , answer = ""
-            , chat = (update (ChatAction (Chat.SendMsg "Me" model.answer)) model).chat
+            , chat = (update (ChatAction (Chat.SendMsg "You" model.answer)) model).chat
         }
     ChatAction act ->
         { model | chat = Chat.update act model.chat
