@@ -53,20 +53,15 @@ is13 code =
   if code == 13 then Ok () else Err "not the right key code"
 
 
-answerLine answer = li [] [ text answer ]
-
 questionSetOption questionSet = option [ value questionSet.id] [(text questionSet.title)]
 
 counter address model =
-  div []
-    [ div [] [ text model.question ]
-    , input [ id "question"
+  div [] [ input [ id "question"
             , value model.answer
             , on "input" targetValue (Signal.message address << SetAnswer)
             , autofocus True
             , onEnter address CommitAnswer
             ] []
-    , div [] (List.map answerLine model.answers)
     , select [ on "change" targetValue (Signal.message address << SetQuestionSet)
         ] (List.map questionSetOption Questions.list)
     , Chat.view (Signal.forwardTo address ChatAction) model.chat
@@ -103,8 +98,7 @@ update action model =
         let
             qs = Questions.get questionSetId
         in
-            { model | questions = qs,
-                question = Maybe.withDefault "" (List.head qs) }
+            nextQuestion { model | questions = qs }
     SetQuestion question' ->
         { --model | question = question'
          model |chat = (update (ChatAction (Chat.SendMsg "Socrateaser" question')) model).chat
