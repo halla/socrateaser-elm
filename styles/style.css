@@ -1,0 +1,5 @@
+
+li { line-height: 1.4; }
+li { list-style: none; margin-left: 1em; }
+li .username { display: none }
+li.socrateaser { font-style: italic; margin: 1em 0; }
