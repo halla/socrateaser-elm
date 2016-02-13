@@ -1,5 +1,9 @@
-module Questions (list, get) where
+module Questions (list, get, init, update, Model, Action) where
 
+import Http
+import Json.Decode as Json exposing ((:=))
+import Task
+import Effects exposing (Effects)
 
 get : String -> List String
 get id =
@@ -18,6 +22,20 @@ defaultList =
         , "Have you tried selecting a question set?"
         ]
     }
+
+type alias QuestionSet =
+    { id : String
+    , title : String
+    , questions : List String
+    }
+
+type alias Model = List QuestionSet
+
+init : (Model, Effects Action)
+init =
+    ( list
+    , getQuestionSet
+    )
 
 list = [
     defaultList,
@@ -39,3 +57,28 @@ list = [
     { id = "2"
     , title = "Reflection 1"
     , questions = [ "Why?", "Who?"]}]
+
+
+
+getQuestionSet :  Effects Action
+getQuestionSet =
+  Http.get decodeUrl "questions.json"
+    |> Task.toMaybe
+    |> Task.map NewSet
+    |> Effects.task
+
+
+type Action
+    = NewSet (Maybe QuestionSet)
+
+update : Action -> Model -> (Model, Effects Action)
+update action model =
+    case action of
+        NewSet questionSet ->  (model ++ [ Maybe.withDefault {id = "dasf", title = "Uknkow", questions = []} questionSet], Effects.none)
+
+decodeUrl : Json.Decoder QuestionSet
+decodeUrl =
+    Json.object3 QuestionSet
+    ("id" := Json.string)
+    ("title" := Json.string)
+    ("questions" := Json.list Json.string)

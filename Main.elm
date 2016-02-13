@@ -1,15 +1,23 @@
 import Html exposing (div, button, text, input, Html, ul, li, Attribute, select, option)
 import Html.Events exposing (onClick, on, targetValue, keyCode)
 import Html.Attributes exposing (id, value, autofocus, name)
-import StartApp.Simple as StartApp
+import StartApp as StartApp
 import Json.Decode as Json
 import Signal exposing (Address, Signal)
 import Questions
 import Chat
+import Effects exposing (Effects)
 
-main =
-    StartApp.start { model = init, view = view, update = update }
+app =
+    StartApp.start
+        { init = init
+        , view = view
+        , update = update
+        , inputs = []
+        }
 
+
+main = app.html
 
 --model : Signal Model
 --model = Signal.foldp update init actions.signal
@@ -24,21 +32,21 @@ type alias Model =
     , answers : List String
     , answer : String
     , chat : Chat.Model
+    , questionSets : Questions.Model
     }
 
 
-init : Model
+init : (Model, Effects Action)
 init =
-    { questions = [ "What if?", "What then?"]
+    ({ questions = [ "What if?", "What then?"]
     , question = "Press <enter> on empty line to get the next question1."
     , answers = ["answer1", "answer2" ]
     , answer = ""
     , chat = Chat.init
-    }
+    , questionSets = (fst Questions.init)
+    }, Effects.map QuestionsAction (snd Questions.init))
 
 
-view : Signal.Address Action -> Model -> Html
-view = counter
 
 -- enter handling from todomvc --
 onEnter : Address a -> a -> Attribute
@@ -55,16 +63,18 @@ is13 code =
 
 questionSetOption questionSet = option [ value questionSet.id] [(text questionSet.title)]
 
-counter address model =
-  div [] [ input [ id "question"
-            , value model.answer
-            , on "input" targetValue (Signal.message address << SetAnswer)
-            , autofocus True
-            , onEnter address CommitAnswer
-            ] []
-    , select [ on "change" targetValue (Signal.message address << SetQuestionSet)
-        ] (List.map questionSetOption Questions.list)
+
+view : Signal.Address Action -> Model -> Html
+view address model =
+  div [] [ select [ on "change" targetValue (Signal.message address << SetQuestionSet)
+        ] (List.map questionSetOption model.questionSets)
     , Chat.view (Signal.forwardTo address ChatAction) model.chat
+    , input [ id "question"
+              , value model.answer
+              , on "input" targetValue (Signal.message address << SetAnswer)
+              , autofocus True
+              , onEnter address CommitAnswer
+              ] []
     ]
 
 nextQuestion model =
@@ -76,7 +86,7 @@ nextQuestion model =
             (Just q, Just qs) -> { model
                 | question = q
                 , questions = qs
-                , chat = (update (ChatAction (Chat.SendMsg "Socrateaser" q)) model).chat
+                , chat = (fst (update (ChatAction (Chat.SendMsg "Socrateaser" q)) model)).chat
             }
             (Just q, Nothing) -> { model | question = q }
             (Nothing, Just qs) -> { model | question = "This shouldn't have happened!"  }
@@ -89,30 +99,36 @@ type Action
     | CommitAnswer
     | SetQuestionSet String
     | ChatAction Chat.Action
+    | QuestionsAction Questions.Action
 
-update : Action -> Model -> Model
+update : Action -> Model -> (Model, Effects Action)
 update action model =
   case action of
-    NoOp -> model
+    NoOp -> (model, Effects.none)
     SetQuestionSet questionSetId ->
         let
             qs = Questions.get questionSetId
         in
-            nextQuestion { model | questions = qs }
+            (nextQuestion { model | questions = qs }, Effects.none)
     SetQuestion question' ->
-        { --model | question = question'
-         model |chat = (update (ChatAction (Chat.SendMsg "Socrateaser" question')) model).chat
-        }
+        ({ --model | question = question'
+         model |chat = (fst (update (ChatAction (Chat.SendMsg "Socrateaser" question')) model)).chat
+        }, Effects.none)
     SetAnswer answer' ->
-        { model | answer = answer' }
+        ({ model | answer = answer' }, Effects.none)
     CommitAnswer ->
         if model.answer == ""
-            then nextQuestion model
-            else { model | answers = model.answers ++ [model.answer]
+            then (nextQuestion model, Effects.none)
+            else ({ model | answers = model.answers ++ [model.answer]
             , answer = ""
-            , chat = (update (ChatAction (Chat.SendMsg "You" model.answer)) model).chat
-        }
+            , chat = (fst (update (ChatAction (Chat.SendMsg "You" model.answer)) model)).chat
+        }, Effects.none)
     ChatAction act ->
-        { model | chat = Chat.update act model.chat
+        ({ model | chat = Chat.update act model.chat
 
-        }
+        }, Effects.none)
+    QuestionsAction act ->
+        let
+            (modl, fx) = Questions.update act model.questionSets
+        in
+            ({ model | questionSets = modl }, Effects.map QuestionsAction fx)
