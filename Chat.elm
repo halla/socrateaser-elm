@@ -51,3 +51,7 @@ update action model =
     case action of
         SendMsg user' text' ->
              model ++ [ { user = user', text = text' } ]
+
+--port requestUser : Signal String
+--port requestUser =
+--    signalOfUsersWeWantMoreInfoOn

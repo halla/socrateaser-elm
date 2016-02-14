@@ -6,7 +6,8 @@ import Json.Decode as Json
 import Signal exposing (Address, Signal)
 import Questions
 import Chat
-import Effects exposing (Effects)
+import Effects exposing (Effects, Never)
+import Task
 
 app =
     StartApp.start
@@ -131,4 +132,9 @@ update action model =
         let
             (modl, fx) = Questions.update act model.questionSets
         in
+            --Debug.watchSummary modl
             ({ model | questionSets = modl }, Effects.map QuestionsAction fx)
+
+port tasks : Signal (Task.Task Never ())
+port tasks =
+  app.tasks
