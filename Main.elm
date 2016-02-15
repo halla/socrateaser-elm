@@ -108,7 +108,7 @@ update action model =
     NoOp -> (model, Effects.none)
     SetQuestionSet questionSetId ->
         let
-            qs = Questions.get questionSetId
+            qs = Questions.get model.questionSets questionSetId
         in
             (nextQuestion { model | questions = qs }, Effects.none)
     SetQuestion question' ->

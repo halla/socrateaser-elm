@@ -1,18 +1,19 @@
-module Questions (list, get, init, update, Model, Action) where
+module Questions (get, init, update, Model, Action) where
 
 import Http
+import Html exposing (div, text, Html)
 import Json.Decode as Json exposing ((:=))
 import Task
 import Effects exposing (Effects)
 
-get : String -> List String
-get id =
+get : List QuestionSet -> String -> List String
+get questionSet id =
     let
-        qs = (List.head (List.filter (\q -> q.id == id) list))
+        qs = (List.head (List.filter (\q -> q.id == id) questionSet))
     in
         case qs of
             Just qs' -> qs'.questions
-            Nothing -> []
+            Nothing -> ["Sorry, no questions found in this set. :( "]
 
 defaultList =
     { id = "0"
@@ -30,6 +31,8 @@ type alias QuestionSet =
     }
 
 type alias Model = List QuestionSet
+
+
 
 init : (Model, Effects Action)
 init =
@@ -68,17 +71,29 @@ getQuestionSet =
     |> Effects.task
 
 
+view : Signal.Address Action -> Model -> Html
+view action model =
+    div [] [(text "jep")]
+
+
 type Action
-    = NewSet (Maybe QuestionSet)
+    = NewSet (Maybe (List QuestionSet))
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =
     case action of
-        NewSet questionSet ->  (model ++ [ Maybe.withDefault {id = "dasf", title = "Uknkow", questions = []} questionSet], Effects.none)
+        NewSet questionSets ->  (model ++ Maybe.withDefault [{id = "unknown1", title = "Unknown", questions = ["Sorry, no questions found."]}] questionSets, Effects.none)
 
-decodeUrl : Json.Decoder QuestionSet
-decodeUrl =
+
+decodeQuestionSets =
+    Json.list decodeQuestionSet
+
+decodeQuestionSet =
     Json.object3 QuestionSet
-    ("id" := Json.string)
-    ("title" := Json.string)
-    ("questions" := Json.list Json.string)
+        ("id" := Json.string)
+        ("title" := Json.string)
+        ("questions" := (Json.list Json.string))
+
+decodeUrl : Json.Decoder (List QuestionSet)
+decodeUrl =
+    Json.at ["data"] decodeQuestionSets
