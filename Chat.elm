@@ -20,14 +20,14 @@ getMsgs : List Msg
 getMsgs = []
 
 
--- Model --
+-- MODEL --
 
 type alias Model = List Msg
 
 init = [{ user = "Socrateaser", text = "Welcome to Socrateaser! Press <enter> on empty line to get the next question."}]
 
 
--- View --
+-- VIEW --
 
 --view : Signal Action -> Model -> Html--
 view address model = ul [class "list-unstyled"] (List.map chatLine model)
@@ -40,7 +40,7 @@ chatLine msg =
 
 
 
--- Update --
+-- UPDATE --
 
 type Action =
     SendMsg User String
