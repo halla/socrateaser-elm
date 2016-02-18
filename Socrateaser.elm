@@ -7,7 +7,7 @@ import Signal exposing (Address, Signal)
 import Effects exposing (Effects, Never)
 import Html exposing (div, button, text, input, Html, ul, li, Attribute, select, option)
 import Html.Events exposing (onClick, on, targetValue, keyCode)
-import Html.Attributes exposing (id, value, autofocus, name)
+import Html.Attributes exposing (id, value, autofocus, name, class)
 
 
 -- MODEL --
@@ -54,17 +54,26 @@ is13 code =
 
 
 
+userInputText address model =
+    input [ id "question"
+            , class "form-control"
+            , value model.answer
+            , on "input" targetValue (Signal.message address << SetAnswer)
+            , autofocus True
+            , onEnter address CommitAnswer
+            ] []
+
+questionSetSelector address options =
+    select [ on "change" targetValue (Signal.message address << SetQuestionSet)
+             , class "questionset form-control"
+    ] options
+
 view : Signal.Address Action -> Model -> Html
 view address model =
-  div [] [ select [ on "change" targetValue (Signal.message address << SetQuestionSet)
-        ] (List.map questionSetOption model.questionSets)
-    , Chat.view (Signal.forwardTo address ChatAction) model.chat
-    , input [ id "question"
-              , value model.answer
-              , on "input" targetValue (Signal.message address << SetAnswer)
-              , autofocus True
-              , onEnter address CommitAnswer
-              ] []
+  div [ class "app"]
+    [ Chat.view (Signal.forwardTo address ChatAction) model.chat
+    , userInputText address model
+    , questionSetSelector address (List.map questionSetOption model.questionSets)
     ]
 
 
@@ -81,8 +90,11 @@ nextQuestion model =
                 , questions = qs
                 , chat = (fst (update (ChatAction (Chat.SendMsg "Socrateaser" q)) model)).chat
             }
-            (Just q, Nothing) -> { model | question = q }
-            (Nothing, Just qs) -> { model | question = "This shouldn't have happened!"  }
+            (Just q, Nothing) -> { model | question = "" }
+            (Nothing, Just qs) -> { model
+                | question = "This shouldn't have happened!"
+                , chat = (fst (update (ChatAction (Chat.SendMsg "Socrateaser" "sdf")) model)).chat
+            }
             (Nothing, Nothing) -> { model | question = "Yay! We're done!" }
 
 type Action
