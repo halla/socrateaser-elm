@@ -1,10 +1,12 @@
-module Questions (get, init, update, Model, Action) where
+module Questions (get, init, update, Model, Action, genericProblem) where
 
 import Http
 import Html exposing (div, text, Html)
 import Json.Decode as Json exposing ((:=))
 import Task
 import Effects exposing (Effects)
+
+
 
 get : List QuestionSet -> String -> List String
 get questionSet id =
@@ -24,6 +26,18 @@ defaultList =
         ]
     }
 
+genericProblem =
+    [ "What is the problem that you need a new solution for?",
+        "Why is this a problem?",
+        "Can you be more specific?",
+        "What are some similar problems that you or someone else have?",
+        "What is common to all these problems?",
+        "What stops you from solving the problem now?",
+        "What would you guess that you think about this problem in 10 years?",
+        "What could you do to solve the problem?",
+        "What is the first thing you are going to do to solve the problem?",
+        "Well, done! Now go and do that!"
+    ]
 type alias QuestionSet =
     { id : String
     , title : String
@@ -39,6 +53,8 @@ init =
     ( list
     , getQuestionSet
     )
+
+
 
 list = [
     defaultList,

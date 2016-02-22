@@ -4,7 +4,7 @@ import Questions
 import Chat
 import Json.Decode as Json
 import Signal exposing (Address, Signal)
-import Effects exposing (Effects, Never)
+import Effects exposing (Effects)
 import Html exposing (div, button, text, input, Html, ul, li, Attribute, select, option)
 import Html.Events exposing (onClick, on, targetValue, keyCode)
 import Html.Attributes exposing (id, value, autofocus, name, class)
@@ -24,13 +24,16 @@ type alias Model =
 
 init : (Model, Effects Action)
 init =
-    ({ questions = [ "What if?", "What then?"]
+    ({ questions =  Questions.genericProblem
     , question = "Press <enter> on empty line to get the next question1."
     , answers = ["answer1", "answer2" ]
     , answer = ""
     , chat = Chat.init
     , questionSets = (fst Questions.init)
-    }, Effects.map QuestionsAction (snd Questions.init))
+    }, Effects.batch
+    [ Effects.map QuestionsAction (snd Questions.init)
+    ]
+    )
 
 
 
