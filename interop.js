@@ -4,6 +4,8 @@ function scrollToBottom() {
     element.scrollTop = element.scrollHeight;
 }
 
-setInterval(scrollToBottom, 500);
+function chatMsg(msg) {
+    setTimeout(scrollToBottom, 100); // otherwise view gets updated after...
+}
 
-//Main.ports.requestScrollBottom.subscribe(scrollToBottom);
+socrateaser.ports.chatMsg.subscribe(chatMsg);

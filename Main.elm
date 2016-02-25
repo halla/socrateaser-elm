@@ -17,3 +17,7 @@ main = app.html
 port tasks : Signal (Task.Task Never ())
 port tasks =
   app.tasks
+
+port chatMsg : Signal String
+port chatMsg =
+    Signal.map (\_ -> "msg") app.model
