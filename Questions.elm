@@ -11,7 +11,10 @@ import Effects exposing (Effects)
 get : List QuestionSet -> String -> List String
 get questionSet id =
     let
-        qs = (List.head (List.filter (\q -> q.id == id) questionSet))
+        qs =
+            questionSet
+                |> List.filter (\q -> q.id == id)
+                |> List.head
     in
         case qs of
             Just qs' -> qs'.questions
@@ -98,7 +101,7 @@ type Action
 update : Action -> Model -> (Model, Effects Action)
 update action model =
     case action of
-        NewSet questionSets ->  (model ++ Maybe.withDefault [{id = "unknown1", title = "Unknown", questions = ["Sorry, no questions found."]}] questionSets, Effects.none)
+        NewSet questionSets -> (model ++ Maybe.withDefault [{id = "unknown1", title = "Unknown", questions = ["Sorry, no questions found."]}] questionSets, Effects.none)
 
 
 decodeQuestionSets =
