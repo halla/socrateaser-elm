@@ -81,13 +81,7 @@ list = [
     , questions = [ "Why?", "Who?"]}]
 
 
-
-getQuestionSet :  Effects Action
-getQuestionSet =
-  Http.get decodeUrl "questions.json"
-    |> Task.toMaybe
-    |> Task.map NewSet
-    |> Effects.task
+-- VIEW --
 
 
 view : Signal.Address Action -> Model -> Html
@@ -95,8 +89,19 @@ view action model =
     div [] [(text "jep")]
 
 
+-- UPDATE --
+
+
 type Action
     = NewSet (Maybe (List QuestionSet))
+
+getQuestionSet : Effects Action
+getQuestionSet =
+  Http.get decodeUrl "questions.json"
+    |> Task.toMaybe
+    |> Task.map NewSet
+    |> Effects.task
+
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =

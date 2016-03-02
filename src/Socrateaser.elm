@@ -10,6 +10,7 @@ import Html.Events exposing (onClick, on, targetValue, keyCode)
 import Html.Attributes exposing (id, value, autofocus, name, class)
 
 
+
 -- MODEL --
 
 type alias Model =

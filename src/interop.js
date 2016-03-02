@@ -8,4 +8,4 @@ function chatMsg(msg) {
     setTimeout(scrollToBottom, 100); // otherwise view gets updated after...
 }
 
-socrateaser.ports.chatMsg.subscribe(chatMsg);
+module.exports = { chatMsg: chatMsg };
