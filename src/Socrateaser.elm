@@ -23,20 +23,23 @@ type alias Model =
     }
 
 
-init : (Model, Effects Action)
-init =
-    ({ questions =  Questions.genericProblem
+initialModel =
+    { questions =  Questions.genericProblem
     , question = "Press <enter> on empty line to get the next question1."
     , answers = ["answer1", "answer2" ]
     , answer = ""
     , chat = Chat.init
     , questionSets = (fst Questions.init)
-    }, Effects.batch
-    [ Effects.map QuestionsAction (snd Questions.init)
-    ]
+    }
+
+init : (Model, Effects Action)
+init =
+    (initialModel
+        |> update (SetQuestionSet "1")
+        |> fst -- ignore effects
+    , Effects.batch
+    [ Effects.map QuestionsAction (snd Questions.init) ]
     )
-
-
 
 
 -- VIEW --

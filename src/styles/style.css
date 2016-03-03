@@ -2,6 +2,7 @@
 .app { width: 40em; margin: 3em 20% }
 input { padding: 0.5em;  }
 select.questionset { margin: 20px 0}
+select.questionset { display: none }
 ul { height: 70vh; overflow-y: scroll; padding-right: 5em; padding-top: 50%;}
 li { line-height: 1.4; }
 li { list-style: none; margin-left: 1em;}
