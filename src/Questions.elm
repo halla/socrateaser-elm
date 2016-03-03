@@ -1,4 +1,4 @@
-module Questions (get, init, update, Model, Action, genericProblem) where
+module Questions (get, init, update, Model, Action) where
 
 import Http
 import Html exposing (div, text, Html)
@@ -78,7 +78,10 @@ list = [
     ]},
     { id = "2"
     , title = "Reflection 1"
-    , questions = [ "Why?", "Who?"]}]
+    , questions = [ "Why?", "Who?"]},
+    { id = "generic_problem"
+    , title = "Generic Problem"
+    , questions = genericProblem }]
 
 
 -- VIEW --

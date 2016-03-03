@@ -24,7 +24,7 @@ type alias Model =
 
 
 initialModel =
-    { questions =  Questions.genericProblem
+    { questions =  []
     , question = "Press <enter> on empty line to get the next question1."
     , answers = ["answer1", "answer2" ]
     , answer = ""
@@ -35,7 +35,7 @@ initialModel =
 init : (Model, Effects Action)
 init =
     (initialModel
-        |> update (SetQuestionSet "1")
+        |> update (SetQuestionSet "generic_problem")
         |> fst -- ignore effects
     , Effects.batch
     [ Effects.map QuestionsAction (snd Questions.init) ]
