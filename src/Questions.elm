@@ -30,9 +30,9 @@ defaultList =
     }
 
 genericProblem =
-    [ "What is the problem that you need a new solution for?",
+    [ "What is the problem that you need a solution for?",
         "Why is this a problem?",
-        "Can you be more specific?",
+        "How could you describe it in more specific terms?",
         "What are some similar problems that you or someone else have?",
         "What is common to all these problems?",
         "What stops you from solving the problem now?",

@@ -24,7 +24,16 @@ getMsgs = []
 
 type alias Model = List Msg
 
-init = [{ user = "Socrateaser", text = "Welcome to Socrateaser! Press <enter> on empty line to get the next question."}]
+init =
+    [ { user = "Socrateaser" , text = "Welcome!" }
+    , { user = "Socrateaser" , text = "---" }
+    , { user = "Socrateaser" , text = "I'm Socrateaser, and I will guide you through a generic problem solving process by asking you a series of questions." }
+    , { user = "Socrateaser" , text = "Answer each question by typing into the text box below and pressing <enter>" }
+    , { user = "Socrateaser" , text = "You can give multiple answers to every question. " }
+    , { user = "Socrateaser" , text = "When you are ready to move on to the next question, just press <enter> one extra time (without an answer)." }
+    , { user = "Socrateaser" , text = "Ready? Let's start!" }
+    , { user = "Socrateaser" , text = "---" }
+    ]
 
 
 -- VIEW --
