@@ -38,8 +38,8 @@ init =
 
 -- VIEW --
 
---view : Signal Action -> Model -> Html--
-view address model = ul [class "list-unstyled"] (List.map chatLine model)
+view : Signal.Address Action -> Model -> Html
+view address model = ul [class "list-unstyled chat-msgs"] (List.map chatLine model)
 
 chatLine msg =
     li [ class (String.toLower msg.user) ]
@@ -60,7 +60,3 @@ update action model =
     case action of
         SendMsg user' text' ->
              model ++ [ { user = user', text = text' } ]
-
---port requestUser : Signal String
---port requestUser =
---    signalOfUsersWeWantMoreInfoOn
