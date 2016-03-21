@@ -42,10 +42,15 @@ view : Signal.Address Action -> Model -> Html
 view address model = ul [class "list-unstyled chat-msgs"] (List.map chatLine model)
 
 chatLine msg =
-    li [ class (String.toLower msg.user) ]
-        [ div [class ("username " ++ msg.user) ] [text msg.user]
-        , div [class "text"] [text msg.text]
-        ]
+    let
+        textElem = case msg.user of
+            "You" -> ul [class "list-unstyled"] [ li [] [text msg.text] ]
+            _ -> text msg.text
+    in
+        li [ class (String.toLower msg.user) ]
+            [ div [class ("username " ++ msg.user) ] [ text msg.user ]
+            , div [class "text"] [ textElem ]
+            ]
 
 
 
@@ -59,4 +64,6 @@ update : Action -> Model -> Model
 update action model =
     case action of
         SendMsg user' text' ->
-             model ++ [ { user = user', text = text' } ]
+            case user' of
+                "You" -> model ++ [ { user = user', text = text' } ]
+                _ -> model ++ [ { user = user', text = text' } ]
